@@ -1,0 +1,25 @@
+version: '3'
+services:
+  web:
+    build: ./web
+    container_name: proxy_web
+    restart: always
+    environment:
+      - ACCESS_CODE=1234          # [설정] 여기서 비밀번호(Access Code)를 정하세요
+      - ALLOWED_DOMAINS=example.com,test.com  # [설정] 보유한 도메인들을 쉼표(,)로 구분
+  
+  redis:
+    image: redis:alpine
+    container_name: proxy_redis
+    restart: always
+
+  nginx:
+    image: openresty/openresty:alpine
+    container_name: proxy_gateway
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
+    depends_on:
+      - web
+      - redis
